@@ -1,5 +1,17 @@
 package com.masum.weather
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.window.Popup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +29,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+@Composable
+fun AnimatedHamburgerMenu(
+    visible: Boolean,
+    iconOffset: Pair<Float, Float>,
+    onDismiss: () -> Unit,
+    onMenuItemClick: (String) -> Unit = {}
+) {
+    // Animate scale for pop effect
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.7f,
+        animationSpec = tween(durationMillis = 350)
+    )
+    if (visible) {
+        Popup(
+            alignment = Alignment.TopStart,
+            offset = IntOffset(iconOffset.first.toInt(), iconOffset.second.toInt()),
+            onDismissRequest = onDismiss
+        ) {
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(350)),
+                exit = fadeOut(tween(200))
+            ) {
+                HamburgerMenu(
+                    modifier = Modifier
+                        .scale(scale)
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp)
+                        ),
+                    onMenuItemClick = {
+                        onMenuItemClick(it)
+                        onDismiss()
+                    }
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun HamburgerMenu(
