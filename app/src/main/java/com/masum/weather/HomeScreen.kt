@@ -105,25 +105,54 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 100.dp),
+                .padding(top = 80.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val tempGradient = Brush.linearGradient(
-                colors = listOf(Color(0xFFb2f0ff), Color(0xFF2193b0)),
-                start = androidx.compose.ui.geometry.Offset(0f, 0f),
-                end = androidx.compose.ui.geometry.Offset(200f, 200f),
-                tileMode = TileMode.Clamp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column {
+                    Text(
+                        text = "Kolkata",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Today, July 15 5:10",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        painter = painterResource(id = android.R.drawable.ic_menu_day),
+                        contentDescription = "Weather Icon",
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Text(
+                        text = "It's Sunny",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+            }
             Text(
                 buildAnnotatedString {
                     withStyle(
                         style = SpanStyle(
-                            brush = tempGradient,
-                            fontSize = 80.sp,
+                            color = Color.White,
+                            fontSize = 96.sp,
                             fontWeight = Light,
                             shadow = Shadow(
                                 color = Color(0x552193b0),
-                                blurRadius = 12f
+                                blurRadius = 16f
                             )
                         )
                     ) {
@@ -131,8 +160,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     }
                     withStyle(
                         style = SpanStyle(
-                            brush = tempGradient,
-                            fontSize = 32.sp,
+                            color = Color.White,
+                            fontSize = 36.sp,
                             fontWeight = Normal,
                             baselineShift = androidx.compose.ui.text.style.BaselineShift.Superscript
                         )
@@ -140,21 +169,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         append("°")
                     }
                 },
-                modifier = Modifier,
+                modifier = Modifier.padding(top = 16.dp),
                 textAlign = TextAlign.Center
-            )
-            Text(
-                text = "It's Sunny",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            Text(
-                text = "Today, Oct 18 5:10",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 16.sp,
-                modifier = Modifier.padding(top = 4.dp)
             )
         }
         Box(
