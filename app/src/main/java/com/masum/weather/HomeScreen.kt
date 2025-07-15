@@ -1,7 +1,5 @@
 package com.masum.weather
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,51 +10,40 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextGeometricTransform
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.font.FontWeight.Companion.Light
-import androidx.compose.ui.text.font.FontWeight.Companion.Normal
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.masum.weather.ui.theme.WeatherTheme
@@ -68,14 +55,22 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFFb2f0ff), Color(0xFFe0c3fc))
+                    colors = listOf(
+                        Color(0xFF87CEEB), // Sky blue
+                        Color(0xFF4682B4), // Steel blue
+                        Color(0xFF6A5ACD), // Slate blue
+                        Color(0xFF9370DB)  // Medium purple
+                    )
                 )
             )
     ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawLandscapeBackground(this)
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 32.dp, start = 24.dp, end = 24.dp),
+                .padding(top = 48.dp, start = 24.dp, end = 24.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -84,82 +79,71 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = "Location",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 )
                 Text(
                     text = "Tuscany",
                     color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 8.dp)
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(start = 6.dp)
                 )
             }
             IconButton(onClick = { /* TODO: Menu */ }) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Menu",
-                    tint = Color.White
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 80.dp),
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+                .padding(top = 120.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
                 Column {
                     Text(
-                        text = "Khardaha",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "Today, July 15 5:10",
-                        color = Color.White.copy(alpha = 0.8f),
+                        text = "Today, Oct 19 6:10",
+                        color = Color.White.copy(alpha = 0.9f),
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 2.dp)
+                        fontWeight = FontWeight.Light
                     )
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        painter = painterResource(id = android.R.drawable.ic_menu_day),
-                        contentDescription = "Weather Icon",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Canvas(modifier = Modifier.size(32.dp)) {
+                        drawSunIcon(this)
+                    }
                     Text(
                         text = "It's Sunny",
                         color = Color.White,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Light,
-                        modifier = Modifier.padding(top = 2.dp)
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }
-            val tempGradient = Brush.linearGradient(
-                colors = listOf(Color(0xFFb2f0ff), Color(0xFF2193b0)),
-                start = androidx.compose.ui.geometry.Offset(0f, 0f),
-                end = androidx.compose.ui.geometry.Offset(200f, 200f),
-                tileMode = TileMode.Clamp
-            )
             Text(
                 buildAnnotatedString {
                     withStyle(
                         style = SpanStyle(
-                            brush = tempGradient,
-                            fontSize = 96.sp,
-                            fontWeight = FontWeight.Light,
+                            color = Color.White,
+                            fontSize = 120.sp,
+                            fontWeight = FontWeight.Thin,
                             shadow = Shadow(
-                                color = Color(0x552193b0),
-                                blurRadius = 24f,
-                                offset = androidx.compose.ui.geometry.Offset(0f, 8f)
+                                color = Color.Black.copy(alpha = 0.3f),
+                                blurRadius = 8f,
+                                offset = Offset(0f, 4f)
                             )
                         )
                     ) {
@@ -167,84 +151,152 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     }
                     withStyle(
                         style = SpanStyle(
-                            brush = tempGradient,
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Normal,
-                            baselineShift = androidx.compose.ui.text.style.BaselineShift.Superscript
+                            color = Color.White,
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Thin
                         )
                     ) {
                         append("°")
                     }
                 },
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier
+                    .padding(top = 40.dp)
+                    .align(Alignment.CenterHorizontally),
                 textAlign = TextAlign.Center
             )
         }
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 32.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.95f)
-                    .height(190.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
                     .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.7f),
-                                Color(0xFFe0c3fc).copy(alpha = 0.3f)
-                            )
-                        ),
-                        shape = RoundedCornerShape(36.dp)
+                        Color.White.copy(alpha = 0.9f)
                     )
-                    .padding(top = 18.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+                    .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
-                        .width(60.dp)
-                        .height(8.dp)
+                        .width(40.dp)
+                        .height(4.dp)
                         .background(
-                            color = Color.Gray.copy(alpha = 0.6f),
-                            shape = RoundedCornerShape(50.dp)
+                            Color.Gray.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(2.dp)
                         )
-                        .align(Alignment.CenterHorizontally)
                 )
                 Text(
                     text = "Weather Today",
-                    fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
                     color = Color.Black,
-                    modifier = Modifier.padding(top = 12.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
                 )
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    HourlyWeatherItem(time = "05:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
-                    HourlyWeatherItem(time = "06:00", temp = "16", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
-                    HourlyWeatherItem(time = "07:00", temp = "3", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
-                    HourlyWeatherItem(time = "08:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
+                    HourlyWeatherItem(time = "06:00 AM", temp = "23")
+                    HourlyWeatherItem(time = "09:00 AM", temp = "16")
+                    HourlyWeatherItem(time = "12:00 AM", temp = "3")
+                    HourlyWeatherItem(time = "03:00 AM", temp = "23")
                 }
             }
         }
     }
 }
 
-@Composable
-fun HourlyWeatherItem(time: String, temp: String, iconPainter: Painter) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            painter = iconPainter,
-            contentDescription = null,
-            tint = Color(0xFF2193b0),
-            modifier = Modifier.size(28.dp)
+fun drawLandscapeBackground(drawScope: DrawScope) {
+    with(drawScope) {
+        val width = size.width
+        val height = size.height
+        val mountainPath = Path().apply {
+            moveTo(0f, height * 0.6f)
+            lineTo(width * 0.2f, height * 0.5f)
+            lineTo(width * 0.4f, height * 0.55f)
+            lineTo(width * 0.6f, height * 0.45f)
+            lineTo(width * 0.8f, height * 0.52f)
+            lineTo(width, height * 0.48f)
+            lineTo(width, height)
+            lineTo(0f, height)
+            close()
+        }
+        drawPath(
+            path = mountainPath,
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color(0xFF9370DB).copy(alpha = 0.6f),
+                    Color(0xFF6A5ACD).copy(alpha = 0.4f)
+                )
+            )
         )
-        Text(text = time, fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 4.dp))
-        Text(text = temp + "°", fontSize = 16.sp, color = Color.Black, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+        drawCircle(
+            color = Color.White.copy(alpha = 0.3f),
+            radius = 30f,
+            center = Offset(width * 0.2f, height * 0.25f)
+        )
+        drawCircle(
+            color = Color.White.copy(alpha = 0.2f),
+            radius = 25f,
+            center = Offset(width * 0.7f, height * 0.3f)
+        )
+    }
+}
+
+fun drawSunIcon(drawScope: DrawScope) {
+    with(drawScope) {
+        val center = Offset(size.width / 2, size.height / 2)
+        val radius = size.minDimension / 3
+        for (i in 0 until 8) {
+            val angle = (i * 45f) * (Math.PI / 180f)
+            val startX = center.x + (radius * 1.5f * kotlin.math.cos(angle)).toFloat()
+            val startY = center.y + (radius * 1.5f * kotlin.math.sin(angle)).toFloat()
+            val endX = center.x + (radius * 2f * kotlin.math.cos(angle)).toFloat()
+            val endY = center.y + (radius * 2f * kotlin.math.sin(angle)).toFloat()
+            drawLine(
+                color = Color(0xFFFFD700),
+                start = Offset(startX, startY),
+                end = Offset(endX, endY),
+                strokeWidth = 2.dp.toPx()
+            )
+        }
+        drawCircle(
+            color = Color(0xFFFFD700),
+            radius = radius,
+            center = center
+        )
+    }
+}
+
+@Composable
+fun HourlyWeatherItem(time: String, temp: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        Canvas(modifier = Modifier.size(28.dp)) {
+            drawSunIcon(this)
+        }
+        Text(
+            text = time,
+            fontSize = 12.sp,
+            color = Color.Gray,
+            fontWeight = FontWeight.Light,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+        Text(
+            text = "${temp}°",
+            fontSize = 16.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(top = 2.dp)
+        )
     }
 }
 
