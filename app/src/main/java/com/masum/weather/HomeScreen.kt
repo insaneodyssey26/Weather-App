@@ -2,6 +2,7 @@ package com.masum.weather
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -105,7 +108,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 .padding(top = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Gradient temperature text with shadow and styled degree symbol
             val tempGradient = Brush.linearGradient(
                 colors = listOf(Color(0xFFb2f0ff), Color(0xFF2193b0)),
                 start = androidx.compose.ui.geometry.Offset(0f, 0f),
@@ -158,37 +160,51 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 32.dp)
+                .padding(bottom = 24.dp)
         ) {
-            Card(
-                shape = RoundedCornerShape(32.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.92f)
-                    .height(160.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
-                    Text(
-                        text = "Weather Today",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = Color.Black,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    .fillMaxWidth(0.95f)
+                    .height(190.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.7f),
+                                Color(0xFFe0c3fc).copy(alpha = 0.3f)
+                            )
+                        ),
+                        shape = RoundedCornerShape(36.dp)
                     )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        HourlyWeatherItem(time = "05:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
-                        HourlyWeatherItem(time = "06:00", temp = "16", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
-                        HourlyWeatherItem(time = "07:00", temp = "3", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
-                        HourlyWeatherItem(time = "08:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
-                    }
+                    .padding(top = 18.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(8.dp)
+                        .background(
+                            color = Color.Gray.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(50.dp)
+                        )
+                        .align(Alignment.CenterHorizontally)
+                )
+                Text(
+                    text = "Weather Today",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    modifier = Modifier.padding(top = 12.dp, bottom = 8.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    HourlyWeatherItem(time = "05:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
+                    HourlyWeatherItem(time = "06:00", temp = "16", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
+                    HourlyWeatherItem(time = "07:00", temp = "3", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
+                    HourlyWeatherItem(time = "08:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
                 }
             }
         }
