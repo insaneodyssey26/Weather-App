@@ -3,10 +3,12 @@ package com.masum.weather
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,13 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.DrawerValue
-import kotlinx.coroutines.launch
-import com.masum.weather.HamburgerMenu
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -50,6 +45,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,176 +56,196 @@ import com.masum.weather.ui.theme.WeatherTheme
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            HamburgerMenu(
-                onMenuItemClick = { /* handle menu item click */ scope.launch { drawerState.close() } }
+    var isMenuVisible by remember { mutableStateOf(false) }
+    
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF87CEEB), // Sky blue
+                        Color(0xFF4682B4), // Steel blue
+                        Color(0xFF6A5ACD), // Slate blue
+                        Color(0xFF9370DB)  // Medium purple
+                    )
+                )
+            )
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawLandscapeBackground(this)
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 48.dp, start = 24.dp, end = 24.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { isMenuVisible = !isMenuVisible }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = "Location",
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = "Tuscany",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(start = 6.dp)
             )
         }
-    ) {
-        Box(
-            modifier = modifier
+        
+        LocationSearchBar(
+            modifier = Modifier
+                .padding(top = 100.dp)
+                .align(Alignment.TopCenter),
+            onLocationSelected = { location ->
+                println("Location selected: $location")
+            },
+            onSearchTextChange = { searchText ->
+                println("Search text: $searchText")
+            }
+        )
+        
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF87CEEB),
-                            Color(0xFF4682B4),
-                            Color(0xFF6A5ACD),
-                            Color(0xFF9370DB)
-                        )
-                    )
-                )
+                .padding(horizontal = 24.dp)
+                .padding(top = 180.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawLandscapeBackground(this)
-            }
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 48.dp, start = 24.dp, end = 24.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Location",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+                Column {
                     Text(
-                        text = "Tuscany",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(start = 6.dp)
+                        text = "Today, Oct 19 6:10",
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Light
                     )
                 }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 120.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column {
-                        Text(
-                            text = "Today, Oct 19 6:10",
-                            color = Color.White.copy(alpha = 0.9f),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Light
-                        )
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Canvas(modifier = Modifier.size(32.dp)) {
-                            drawSunIcon(this)
-                        }
-                        Text(
-                            text = "It's Sunny",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Light,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-                Text(
-                    buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                color = Color.White,
-                                fontSize = 120.sp,
-                                fontWeight = FontWeight.Thin,
-                                shadow = Shadow(
-                                    color = Color.Black.copy(alpha = 0.3f),
-                                    blurRadius = 8f,
-                                    offset = Offset(0f, 4f)
-                                )
-                            )
-                        ) {
-                            append("23")
-                        }
-                        withStyle(
-                            style = SpanStyle(
-                                color = Color.White,
-                                fontSize = 48.sp,
-                                fontWeight = FontWeight.Thin
-                            )
-                        ) {
-                            append("°")
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(top = 40.dp)
-                        .align(Alignment.CenterHorizontally),
-                    textAlign = TextAlign.Center
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 32.dp)
-            ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            Color.White.copy(alpha = 0.9f)
-                        )
-                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .background(
-                                Color.Gray.copy(alpha = 0.3f),
-                                shape = RoundedCornerShape(2.dp)
-                            )
-                    )
-                    Text(
-                        text = "Weather Today",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        HourlyWeatherItem(time = "06:00 AM", temp = "23")
-                        HourlyWeatherItem(time = "09:00 AM", temp = "16")
-                        HourlyWeatherItem(time = "12:00 AM", temp = "3")
-                        HourlyWeatherItem(time = "03:00 AM", temp = "23")
+                    Canvas(modifier = Modifier.size(32.dp)) {
+                        drawSunIcon(this)
                     }
+                    Text(
+                        text = "It's Sunny",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+            Text(
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            color = Color.White,
+                            fontSize = 120.sp,
+                            fontWeight = FontWeight.Thin,
+                            shadow = Shadow(
+                                color = Color.Black.copy(alpha = 0.3f),
+                                blurRadius = 8f,
+                                offset = Offset(0f, 4f)
+                            )
+                        )
+                    ) {
+                        append("23")
+                    }
+                    withStyle(
+                        style = SpanStyle(
+                            color = Color.White,
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Thin
+                        )
+                    ) {
+                        append("°")
+                    }
+                },
+                modifier = Modifier
+                    .padding(top = 40.dp)
+                    .align(Alignment.CenterHorizontally),
+                textAlign = TextAlign.Center
+            )
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 32.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(
+                        Color.White.copy(alpha = 0.9f)
+                    )
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(4.dp)
+                        .background(
+                            Color.Gray.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(2.dp)
+                        )
+                )
+                Text(
+                    text = "Weather Today",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    HourlyWeatherItem(time = "06:00 AM", temp = "23")
+                    HourlyWeatherItem(time = "09:00 AM", temp = "16")
+                    HourlyWeatherItem(time = "12:00 AM", temp = "3")
+                    HourlyWeatherItem(time = "03:00 AM", temp = "23")
                 }
             }
         }
+        
+        if (isMenuVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .align(Alignment.CenterStart)
+                    .clickable(onClick = { isMenuVisible = false })
+            ) {}
+        }
+        HamburgerMenu(
+            isVisible = isMenuVisible,
+            onClose = { isMenuVisible = false },
+            onMenuItemClick = { menuItem ->
+                println("Menu item clicked: $menuItem")
+            }
+        )
     }
 }
 
