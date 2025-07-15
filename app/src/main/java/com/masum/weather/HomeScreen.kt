@@ -37,10 +37,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextGeometricTransform
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight.Companion.Light
+import androidx.compose.ui.text.font.FontWeight.Companion.Normal
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,11 +105,41 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 .padding(top = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Gradient temperature text with shadow and styled degree symbol
+            val tempGradient = Brush.linearGradient(
+                colors = listOf(Color(0xFFb2f0ff), Color(0xFF2193b0)),
+                start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                end = androidx.compose.ui.geometry.Offset(200f, 200f),
+                tileMode = TileMode.Clamp
+            )
             Text(
-                text = "23°",
-                color = Color.White,
-                fontSize = 80.sp,
-                fontWeight = FontWeight.Light
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            brush = tempGradient,
+                            fontSize = 80.sp,
+                            fontWeight = Light,
+                            shadow = Shadow(
+                                color = Color(0x552193b0),
+                                blurRadius = 12f
+                            )
+                        )
+                    ) {
+                        append("23")
+                    }
+                    withStyle(
+                        style = SpanStyle(
+                            brush = tempGradient,
+                            fontSize = 32.sp,
+                            fontWeight = Normal,
+                            baselineShift = androidx.compose.ui.text.style.BaselineShift.Superscript
+                        )
+                    ) {
+                        append("°")
+                    }
+                },
+                modifier = Modifier,
+                textAlign = TextAlign.Center
             )
             Text(
                 text = "It's Sunny",
@@ -142,10 +184,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                             .padding(top = 16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        HourlyWeatherItem(time = "05:00", temp = "23", icon = Icons.Default.Menu)
-                        HourlyWeatherItem(time = "06:00", temp = "16", icon = Icons.Default.Menu)
-                        HourlyWeatherItem(time = "07:00", temp = "3", icon = Icons.Default.Menu)
-                        HourlyWeatherItem(time = "08:00", temp = "23", icon = Icons.Default.Menu)
+                        HourlyWeatherItem(time = "05:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
+                        HourlyWeatherItem(time = "06:00", temp = "16", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
+                        HourlyWeatherItem(time = "07:00", temp = "3", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
+                        HourlyWeatherItem(time = "08:00", temp = "23", iconPainter = painterResource(id = android.R.drawable.ic_menu_day))
                     }
                 }
             }
@@ -154,10 +196,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HourlyWeatherItem(time: String, temp: String, icon: ImageVector) {
+fun HourlyWeatherItem(time: String, temp: String, iconPainter: Painter) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            imageVector = icon,
+            painter = iconPainter,
             contentDescription = null,
             tint = Color(0xFF2193b0),
             modifier = Modifier.size(28.dp)
