@@ -7,14 +7,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,9 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.masum.weather.ui.theme.WeatherTheme
 
 @Composable
@@ -39,73 +53,117 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF2193b0), Color(0xFF6dd5ed))
+                    colors = listOf(Color(0xFFb2f0ff), Color(0xFFe0c3fc))
                 )
-            ),
-        contentAlignment = Alignment.Center
+            )
     ) {
-        Card(
-            shape = RoundedCornerShape(24.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.85f)),
+        Row(
             modifier = Modifier
-                .padding(24.dp)
-                .fillMaxWidth(0.85f)
+                .fillMaxWidth()
+                .padding(top = 32.dp, start = 24.dp, end = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Location",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = "Tuscany",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+            IconButton(onClick = { /* TODO: Menu */ }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    tint = Color.White
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 100.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "23°",
+                color = Color.White,
+                fontSize = 80.sp,
+                fontWeight = FontWeight.Light
+            )
+            Text(
+                text = "It's Sunny",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            Text(
+                text = "Today, Oct 18 5:10",
+                color = Color.White.copy(alpha = 0.8f),
+                fontSize = 16.sp,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 32.dp)
+        ) {
+            Card(
+                shape = RoundedCornerShape(32.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth(0.92f)
+                    .height(160.dp)
             ) {
-                Image(
-                    painter = painterResource(id = android.R.drawable.ic_menu_compass),
-                    contentDescription = "Weather Icon",
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .fillMaxWidth(0.3f)
-                )
-                Text(
-                    text = "Weather App",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color(0xFF2193b0)
-                )
-                Text(
-                    text = "City: [Your City]",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Text(
-                    text = "Temperature: --°C",
-                    style = MaterialTheme.typography.displaySmall,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-                Text(
-                    text = "Condition: [Clear/Sunny]",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-                var isRotating by remember { mutableStateOf(false) }
-                val rotation by animateFloatAsState(
-                    targetValue = if (isRotating) 360f else 0f,
-                    animationSpec = tween(durationMillis = 600),
-                    label = "RefreshRotation"
-                )
-                androidx.compose.material3.IconButton(
-                    onClick = {
-                        isRotating = false
-                        isRotating = true
-                    },
-                    modifier = Modifier.padding(top = 24.dp)
+                Column(
+                    modifier = Modifier.padding(20.dp)
                 ) {
-                    androidx.compose.material3.Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Refresh,
-                        contentDescription = "Refresh",
-                        tint = Color(0xFF2193b0),
-                        modifier = Modifier.rotate(rotation)
+                    Text(
+                        text = "Weather Today",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = Color.Black,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        HourlyWeatherItem(time = "05:00", temp = "23", icon = Icons.Default.Menu)
+                        HourlyWeatherItem(time = "06:00", temp = "16", icon = Icons.Default.Menu)
+                        HourlyWeatherItem(time = "07:00", temp = "3", icon = Icons.Default.Menu)
+                        HourlyWeatherItem(time = "08:00", temp = "23", icon = Icons.Default.Menu)
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun HourlyWeatherItem(time: String, temp: String, icon: ImageVector) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Color(0xFF2193b0),
+            modifier = Modifier.size(28.dp)
+        )
+        Text(text = time, fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 4.dp))
+        Text(text = temp + "°", fontSize = 16.sp, color = Color.Black, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
     }
 }
 
