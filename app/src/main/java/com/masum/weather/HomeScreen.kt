@@ -115,7 +115,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             ) {
                 Column {
                     Text(
-                        text = "Kolkata",
+                        text = "Khardaha",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium
@@ -143,16 +143,23 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     )
                 }
             }
+            val tempGradient = Brush.linearGradient(
+                colors = listOf(Color(0xFFb2f0ff), Color(0xFF2193b0)),
+                start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                end = androidx.compose.ui.geometry.Offset(200f, 200f),
+                tileMode = TileMode.Clamp
+            )
             Text(
                 buildAnnotatedString {
                     withStyle(
                         style = SpanStyle(
-                            color = Color.White,
+                            brush = tempGradient,
                             fontSize = 96.sp,
-                            fontWeight = Light,
+                            fontWeight = FontWeight.Light,
                             shadow = Shadow(
                                 color = Color(0x552193b0),
-                                blurRadius = 16f
+                                blurRadius = 24f,
+                                offset = androidx.compose.ui.geometry.Offset(0f, 8f)
                             )
                         )
                     ) {
@@ -160,9 +167,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     }
                     withStyle(
                         style = SpanStyle(
-                            color = Color.White,
+                            brush = tempGradient,
                             fontSize = 36.sp,
-                            fontWeight = Normal,
+                            fontWeight = FontWeight.Normal,
                             baselineShift = androidx.compose.ui.text.style.BaselineShift.Superscript
                         )
                     ) {
