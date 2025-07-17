@@ -68,6 +68,7 @@ import com.masum.weather.ui.theme.WeatherTheme
 fun HomeScreen(modifier: Modifier = Modifier) {
     var isMenuVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
+    var showAbout by remember { mutableStateOf(false) }
     val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
     val cloud1X by infiniteTransition.animateFloat(
         initialValue = -0.3f,
@@ -346,12 +347,22 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 isVisible = isMenuVisible,
                 onClose = { isMenuVisible = false },
                 onMenuItemClick = { menuItem ->
-                    if (menuItem == "Settings") {
-                        showSettings = true
-                        isMenuVisible = false
+                    when (menuItem) {
+                        "Settings" -> {
+                            showSettings = true
+                            isMenuVisible = false
+                        }
+                        "About" -> {
+                            showAbout = true
+                            isMenuVisible = false
+                        }
                     }
                 }
             )
+
+            if (showAbout) {
+                AboutDialog(onDismiss = { showAbout = false })
+            }
         }
     }
 }
