@@ -98,6 +98,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             repeatMode = RepeatMode.Reverse
         ), label = "cloud2Opacity"
     )
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -105,6 +106,29 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Canvas(modifier = Modifier.matchParentSize().blur(24.dp)) {
             val w = size.width
             val h = size.height
+            if (isDark) {
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color(0xFF232946), Color(0xFF2C2C54)),
+                        startY = 0f, endY = h
+                    ),
+                    size = size
+                )
+            } else {
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFB2EBF2), // Light Cyan
+                            Color(0xFFB3E5FC), // Light Blue
+                            Color(0xFF81D4FA), // Sky Blue
+                            Color(0xFFB2DFDB), // Light Teal
+                            Color(0xFFF5F5F5)  // Very Light Gray (bottom)
+                        ),
+                        startY = 0f, endY = h
+                    ),
+                    size = size
+                )
+            }
             drawCloudGradient(
                 center = Offset(w * cloud1X, h * 0.18f),
                 scale = w * 0.24f,
@@ -167,7 +191,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            
+
             LocationSearchBar(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,7 +203,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     println("Search text: $searchText")
                 }
             )
-            
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
