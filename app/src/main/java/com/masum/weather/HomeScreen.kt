@@ -120,24 +120,24 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(start = 6.dp)
             )
         }
-        LocationSearchBar(
-            modifier = Modifier
-                .padding(top = 100.dp)
-                .align(Alignment.TopCenter),
-            onLocationSelected = { location ->
-                println("Location selected: $location")
-            },
-            onSearchTextChange = { searchText ->
-                println("Search text: $searchText")
-            }
-        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 170.dp),
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            
+            LocationSearchBar(
+                modifier = Modifier.padding(top = 100.dp),
+                onLocationSelected = { location ->
+                    println("Location selected: $location")
+                },
+                onSearchTextChange = { searchText ->
+                    println("Search text: $searchText")
+                }
+            )
+            
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.98f)
@@ -206,50 +206,48 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 32.dp)
-        ) {
-            Column(
+            
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(
-                        Color.White.copy(alpha = 0.9f)
-                    )
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 32.dp)
             ) {
-                Box(
+                Column(
                     modifier = Modifier
-                        .width(40.dp)
-                        .height(4.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(24.dp))
                         .background(
-                            Color.Gray.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(2.dp)
+                            Color.White.copy(alpha = 0.9f)
                         )
-                )
-                Text(
-                    text = "Weather Today",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black,
-                    modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    HourlyWeatherItem(time = "06:00 AM", temp = "23")
-                    HourlyWeatherItem(time = "09:00 AM", temp = "16")
-                    HourlyWeatherItem(time = "12:00 AM", temp = "3")
-                    HourlyWeatherItem(time = "03:00 AM", temp = "23")
+                    Box(
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(4.dp)
+                            .background(
+                                Color.Gray.copy(alpha = 0.3f),
+                                shape = RoundedCornerShape(2.dp)
+                            )
+                    )
+                    Text(
+                        text = "Weather Today",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        HourlyWeatherItem(time = "06:00 AM", temp = "23")
+                        HourlyWeatherItem(time = "09:00 AM", temp = "16")
+                        HourlyWeatherItem(time = "12:00 AM", temp = "3")
+                        HourlyWeatherItem(time = "03:00 AM", temp = "23")
+                    }
                 }
             }
         }
