@@ -42,7 +42,6 @@ fun LocationSearchBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(24.dp)

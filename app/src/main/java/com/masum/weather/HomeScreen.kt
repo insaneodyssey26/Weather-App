@@ -129,7 +129,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         ) {
             
             LocationSearchBar(
-                modifier = Modifier.padding(top = 100.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 100.dp),
                 onLocationSelected = { location ->
                     println("Location selected: $location")
                 },
@@ -140,7 +142,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.98f)
+                    .fillMaxWidth()
                     .clip(RoundedCornerShape(32.dp))
                     .background(Color.White.copy(alpha = 0.18f))
                     .padding(vertical = 28.dp, horizontal = 12.dp)
@@ -210,7 +212,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
                     .padding(bottom = 32.dp)
             ) {
                 Column(
