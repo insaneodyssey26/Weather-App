@@ -67,6 +67,7 @@ import com.masum.weather.ui.theme.WeatherTheme
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
     var isMenuVisible by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
     val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
     val cloud1X by infiniteTransition.animateFloat(
         initialValue = -0.3f,
@@ -99,249 +100,258 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         ), label = "cloud2Opacity"
     )
     val isDark = androidx.compose.foundation.isSystemInDarkTheme()
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        Canvas(modifier = Modifier.matchParentSize().blur(24.dp)) {
-            val w = size.width
-            val h = size.height
-            if (isDark) {
-                drawRect(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color(0xFF232946), Color(0xFF2C2C54)),
-                        startY = 0f, endY = h
-                    ),
-                    size = size
-                )
-            } else {
-                drawRect(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFB2EBF2), // Light Cyan
-                            Color(0xFFB3E5FC), // Light Blue
-                            Color(0xFF81D4FA), // Sky Blue
-                            Color(0xFFB2DFDB), // Light Teal
-                            Color(0xFFF5F5F5)  // Very Light Gray (bottom)
-                        ),
-                        startY = 0f, endY = h
-                    ),
-                    size = size
-                )
-            }
-            drawCloudGradient(
-                center = Offset(w * cloud1X, h * 0.18f),
-                scale = w * 0.24f,
-                alpha = cloud1Opacity
-            )
-            drawCloudGradient(
-                center = Offset(w * cloud2X, h * 0.72f),
-                scale = w * 0.32f,
-                alpha = cloud2Opacity
-            )
-        }
-        Canvas(modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 24.dp, end = 24.dp)
-            .align(Alignment.TopEnd)
-        ) {
-            drawCircle(
-                color = Color(0xFFFFF9C4).copy(alpha = 0.18f),
-                radius = size.minDimension / 3.5f,
-                center = Offset(size.width * 0.85f, size.height * 0.12f)
-            )
-        }
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawLandscapeBackground(this)
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 48.dp, start = 24.dp, end = 24.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { isMenuVisible = !isMenuVisible }) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "Location",
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
-            )
-            Text(
-                text = "Tuscany",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(start = 6.dp)
-            )
-        }
-        Column(
-            modifier = Modifier
+    if (showSettings) {
+        SettingsScreen(
+            onUnitChange = {},
+            onThemeChange = {},
+            onNotificationsChange = {},
+        )
+    } else {
+        Box(
+            modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            LocationSearchBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 100.dp),
-                onLocationSelected = { location ->
-                    println("Location selected: $location")
-                },
-                onSearchTextChange = { searchText ->
-                    println("Search text: $searchText")
-                }
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(32.dp))
-                    .background(Color.White.copy(alpha = 0.18f))
-                    .padding(vertical = 28.dp, horizontal = 12.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Today, Oct 19 6:10",
-                        color = Color.White.copy(alpha = 0.85f),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Canvas(modifier = Modifier.size(36.dp)) {
-                        drawSunIcon(this)
-                    }
-                    Text(
-                        buildAnnotatedString {
-                            withStyle(
-                                style = SpanStyle(
-                                    color = Color.White,
-                                    fontSize = 88.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    shadow = Shadow(
-                                        color = Color.Black.copy(alpha = 0.22f),
-                                        blurRadius = 10f,
-                                        offset = Offset(0f, 4f)
-                                    )
-                                )
-                            ) {
-                                append("23")
-                            }
-                            withStyle(
-                                style = SpanStyle(
-                                    color = Color.White,
-                                    fontSize = 32.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    baselineShift = androidx.compose.ui.text.style.BaselineShift(0.7f)
-                                )
-                            ) {
-                                append("°C")
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .align(Alignment.CenterHorizontally),
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        text = "It's Sunny",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        style = androidx.compose.ui.text.TextStyle(
-                            shadow = Shadow(
-                                color = Color.Black.copy(alpha = 0.18f),
-                                blurRadius = 4f,
-                                offset = Offset(0f, 2f)
-                            )
+            Canvas(modifier = Modifier.matchParentSize().blur(24.dp)) {
+                val w = size.width
+                val h = size.height
+                if (isDark) {
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFF232946), Color(0xFF2C2C54)),
+                            startY = 0f, endY = h
                         ),
-                        modifier = Modifier.padding(top = 6.dp)
+                        size = size
+                    )
+                } else {
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFFB2EBF2), // Light Cyan
+                                Color(0xFFB3E5FC), // Light Blue
+                                Color(0xFF81D4FA), // Sky Blue
+                                Color(0xFFB2DFDB), // Light Teal
+                                Color(0xFFF5F5F5)  // Very Light Gray (bottom)
+                            ),
+                            startY = 0f, endY = h
+                        ),
+                        size = size
                     )
                 }
+                drawCloudGradient(
+                    center = Offset(w * cloud1X, h * 0.18f),
+                    scale = w * 0.24f,
+                    alpha = cloud1Opacity
+                )
+                drawCloudGradient(
+                    center = Offset(w * cloud2X, h * 0.72f),
+                    scale = w * 0.32f,
+                    alpha = cloud2Opacity
+                )
             }
-            
-            Box(
+            Canvas(modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 24.dp, end = 24.dp)
+                .align(Alignment.TopEnd)
+            ) {
+                drawCircle(
+                    color = Color(0xFFFFF9C4).copy(alpha = 0.18f),
+                    radius = size.minDimension / 3.5f,
+                    center = Offset(size.width * 0.85f, size.height * 0.12f)
+                )
+            }
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawLandscapeBackground(this)
+            }
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp)
+                    .padding(top = 48.dp, start = 24.dp, end = 24.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
+                IconButton(onClick = { isMenuVisible = !isMenuVisible }) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Location",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Tuscany",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(start = 6.dp)
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // ...existing code for main content...
+                LocationSearchBar(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            Color.White.copy(alpha = 0.9f)
-                        )
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(top = 100.dp),
+                    onLocationSelected = { location ->
+                        println("Location selected: $location")
+                    },
+                    onSearchTextChange = { searchText ->
+                        println("Search text: $searchText")
+                    }
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(32.dp))
+                        .background(Color.White.copy(alpha = 0.18f))
+                        .padding(vertical = 28.dp, horizontal = 12.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .background(
-                                Color.Gray.copy(alpha = 0.3f),
-                                shape = RoundedCornerShape(2.dp)
-                            )
-                    )
-                    Text(
-                        text = "Weather Today",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
-                    )
-                    val hourlyData = listOf(
-                        "06:00 AM" to "23",
-                        "09:00 AM" to "16",
-                        "12:00 PM" to "3",
-                        "03:00 PM" to "23",
-                        "06:00 PM" to "21",
-                        "09:00 PM" to "18",
-                        "12:00 AM" to "15"
-                    )
-                    androidx.compose.foundation.lazy.LazyRow(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(hourlyData.size) { index ->
-                            val (time, temp) = hourlyData[index]
-                            HourlyWeatherItem(time = time, temp = temp)
+                        Text(
+                            text = "Today, Oct 19 6:10",
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Canvas(modifier = Modifier.size(36.dp)) {
+                            drawSunIcon(this)
+                        }
+                        Text(
+                            buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.White,
+                                        fontSize = 88.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        shadow = Shadow(
+                                            color = Color.Black.copy(alpha = 0.22f),
+                                            blurRadius = 10f,
+                                            offset = Offset(0f, 4f)
+                                        )
+                                    )
+                                ) {
+                                    append("23")
+                                }
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.White,
+                                        fontSize = 32.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        baselineShift = androidx.compose.ui.text.style.BaselineShift(0.7f)
+                                    )
+                                ) {
+                                    append("°C")
+                                }
+                            },
+                            modifier = Modifier
+                                .padding(top = 8.dp)
+                                .align(Alignment.CenterHorizontally),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "It's Sunny",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            style = androidx.compose.ui.text.TextStyle(
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.18f),
+                                    blurRadius = 4f,
+                                    offset = Offset(0f, 2f)
+                                )
+                            ),
+                            modifier = Modifier.padding(top = 6.dp)
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 32.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(
+                                Color.White.copy(alpha = 0.9f)
+                            )
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(4.dp)
+                                .background(
+                                    Color.Gray.copy(alpha = 0.3f),
+                                    shape = RoundedCornerShape(2.dp)
+                                )
+                        )
+                        Text(
+                            text = "Weather Today",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
+                        )
+                        val hourlyData = listOf(
+                            "06:00 AM" to "23",
+                            "09:00 AM" to "16",
+                            "12:00 PM" to "3",
+                            "03:00 PM" to "23",
+                            "06:00 PM" to "21",
+                            "09:00 PM" to "18",
+                            "12:00 AM" to "15"
+                        )
+                        androidx.compose.foundation.lazy.LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(hourlyData.size) { index ->
+                                val (time, temp) = hourlyData[index]
+                                HourlyWeatherItem(time = time, temp = temp)
+                            }
                         }
                     }
                 }
             }
-        }
-        if (isMenuVisible) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .align(Alignment.CenterStart)
-                    .clickable(onClick = { isMenuVisible = false })
-            ) {}
-        }
-        HamburgerMenu(
-            isVisible = isMenuVisible,
-            onClose = { isMenuVisible = false },
-            onMenuItemClick = { menuItem ->
-                println("Menu item clicked: $menuItem")
+            if (isMenuVisible) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f))
+                        .align(Alignment.CenterStart)
+                        .clickable(onClick = { isMenuVisible = false })
+                ) {}
             }
-        )
+            HamburgerMenu(
+                isVisible = isMenuVisible,
+                onClose = { isMenuVisible = false },
+                onMenuItemClick = { menuItem ->
+                    if (menuItem == "Settings") {
+                        showSettings = true
+                        isMenuVisible = false
+                    }
+                }
+            )
+        }
     }
 }
 
