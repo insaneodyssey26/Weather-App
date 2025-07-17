@@ -1,5 +1,11 @@
 package com.masum.weather
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -61,19 +67,29 @@ import com.masum.weather.ui.theme.WeatherTheme
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
     var isMenuVisible by remember { mutableStateOf(false) }
+    val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
+    val offset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 12000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "bg_offset"
+    )
+    val animatedBrush = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFF87CEEB),
+            Color(0xFF4682B4),
+            Color(0xFF6A5ACD),
+            Color(0xFF9370DB)
+        ),
+        start = Offset(0f, offset),
+        end = Offset(offset, 1000f)
+    )
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF87CEEB),
-                        Color(0xFF4682B4),
-                        Color(0xFF6A5ACD),
-                        Color(0xFF9370DB)
-                    )
-                )
-            )
+            .background(animatedBrush)
     ) {
         Canvas(modifier = Modifier
             .fillMaxSize()
