@@ -239,14 +239,23 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         color = Color.Black,
                         modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
                     )
-                    Row(
+                    val hourlyData = listOf(
+                        "06:00 AM" to "23",
+                        "09:00 AM" to "16",
+                        "12:00 PM" to "3",
+                        "03:00 PM" to "23",
+                        "06:00 PM" to "21",
+                        "09:00 PM" to "18",
+                        "12:00 AM" to "15"
+                    )
+                    androidx.compose.foundation.lazy.LazyRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        HourlyWeatherItem(time = "06:00 AM", temp = "23")
-                        HourlyWeatherItem(time = "09:00 AM", temp = "16")
-                        HourlyWeatherItem(time = "12:00 AM", temp = "3")
-                        HourlyWeatherItem(time = "03:00 AM", temp = "23")
+                        items(hourlyData.size) { index ->
+                            val (time, temp) = hourlyData[index]
+                            HourlyWeatherItem(time = time, temp = temp)
+                        }
                     }
                 }
             }
