@@ -24,6 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -53,25 +57,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.masum.weather.ui.theme.WeatherTheme
+import com.masum.weather.MiniForecastItem
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
     var isMenuVisible by remember { mutableStateOf(false) }
-    
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF87CEEB), // Sky blue
-                        Color(0xFF4682B4), // Steel blue
-                        Color(0xFF6A5ACD), // Slate blue
-                        Color(0xFF9370DB)  // Medium purple
+                        Color(0xFF87CEEB),
+                        Color(0xFF4682B4),
+                        Color(0xFF6A5ACD),
+                        Color(0xFF9370DB)
                     )
                 )
             )
     ) {
+        Canvas(modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 24.dp, end = 24.dp)
+            .align(Alignment.TopEnd)
+        ) {
+            drawCircle(
+                color = Color(0xFFFFF9C4).copy(alpha = 0.18f),
+                radius = size.minDimension / 3.5f,
+                center = Offset(size.width * 0.85f, size.height * 0.12f)
+            )
+        }
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawLandscapeBackground(this)
         }
@@ -105,7 +120,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(start = 6.dp)
             )
         }
-        
         LocationSearchBar(
             modifier = Modifier
                 .padding(top = 100.dp)
@@ -117,73 +131,83 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 println("Search text: $searchText")
             }
         )
-        
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
-                .padding(top = 180.dp),
+                .padding(top = 170.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.98f)
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(Color.White.copy(alpha = 0.18f))
+                    .padding(vertical = 28.dp, horizontal = 12.dp)
             ) {
-                Column {
-                    Text(
-                        text = "Today, Oct 19 6:10",
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Light
-                    )
-                }
                 Column(
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Canvas(modifier = Modifier.size(32.dp)) {
+                    Text(
+                        text = "Today, Oct 19 6:10",
+                        color = Color.White.copy(alpha = 0.85f),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Canvas(modifier = Modifier.size(36.dp)) {
                         drawSunIcon(this)
                     }
                     Text(
+                        buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = Color.White,
+                                    fontSize = 88.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    shadow = Shadow(
+                                        color = Color.Black.copy(alpha = 0.22f),
+                                        blurRadius = 10f,
+                                        offset = Offset(0f, 4f)
+                                    )
+                                )
+                            ) {
+                                append("23")
+                            }
+                            withStyle(
+                                style = SpanStyle(
+                                    color = Color.White,
+                                    fontSize = 36.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            ) {
+                                append("°")
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .align(Alignment.CenterHorizontally),
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
                         text = "It's Sunny",
                         color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Light,
-                        modifier = Modifier.padding(top = 4.dp)
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        style = androidx.compose.ui.text.TextStyle(
+                            shadow = Shadow(
+                                color = Color.Black.copy(alpha = 0.18f),
+                                blurRadius = 4f,
+                                offset = Offset(0f, 2f)
+                            )
+                        ),
+                        modifier = Modifier.padding(top = 6.dp)
                     )
                 }
             }
-            Text(
-                buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color.White,
-                            fontSize = 120.sp,
-                            fontWeight = FontWeight.Thin,
-                            shadow = Shadow(
-                                color = Color.Black.copy(alpha = 0.3f),
-                                blurRadius = 8f,
-                                offset = Offset(0f, 4f)
-                            )
-                        )
-                    ) {
-                        append("23")
-                    }
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color.White,
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Thin
-                        )
-                    ) {
-                        append("°")
-                    }
-                },
-                modifier = Modifier
-                    .padding(top = 40.dp)
-                    .align(Alignment.CenterHorizontally),
-                textAlign = TextAlign.Center
-            )
+            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
         Box(
             modifier = Modifier
@@ -229,7 +253,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 }
             }
         }
-        
         if (isMenuVisible) {
             Box(
                 modifier = Modifier
