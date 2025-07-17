@@ -244,11 +244,12 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                             withStyle(
                                 style = SpanStyle(
                                     color = Color.White,
-                                    fontSize = 36.sp,
-                                    fontWeight = FontWeight.SemiBold
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    baselineShift = androidx.compose.ui.text.style.BaselineShift(0.7f)
                                 )
                             ) {
-                                append("°")
+                                append("°C")
                             }
                         },
                         modifier = Modifier
