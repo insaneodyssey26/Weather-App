@@ -68,29 +68,54 @@ import com.masum.weather.ui.theme.WeatherTheme
 fun HomeScreen(modifier: Modifier = Modifier) {
     var isMenuVisible by remember { mutableStateOf(false) }
     val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
-    val offset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
+    val cloud1X by infiniteTransition.animateFloat(
+        initialValue = -0.3f,
+        targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 12000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ), label = "bg_offset"
+            animation = tween(durationMillis = 18000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ), label = "cloud1X"
     )
-    val animatedBrush = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFF87CEEB),
-            Color(0xFF4682B4),
-            Color(0xFF6A5ACD),
-            Color(0xFF9370DB)
-        ),
-        start = Offset(0f, offset),
-        end = Offset(offset, 1000f)
+    val cloud2X by infiniteTransition.animateFloat(
+        initialValue = 1.1f,
+        targetValue = -0.4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 24000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ), label = "cloud2X"
+    )
+    val cloud1Opacity by infiniteTransition.animateFloat(
+        initialValue = 0.7f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(6000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "cloud1Opacity"
+    )
+    val cloud2Opacity by infiniteTransition.animateFloat(
+        initialValue = 0.5f, targetValue = 0.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(8000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "cloud2Opacity"
     )
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(animatedBrush)
     ) {
+        Canvas(modifier = Modifier.matchParentSize().blur(24.dp)) {
+            val w = size.width
+            val h = size.height
+            drawCloudGradient(
+                center = Offset(w * cloud1X, h * 0.18f),
+                scale = w * 0.24f,
+                alpha = cloud1Opacity
+            )
+            drawCloudGradient(
+                center = Offset(w * cloud2X, h * 0.72f),
+                scale = w * 0.32f,
+                alpha = cloud2Opacity
+            )
+        }
         Canvas(modifier = Modifier
             .fillMaxSize()
             .padding(top = 24.dp, end = 24.dp)
@@ -389,4 +414,30 @@ fun HomeScreenPreview() {
     WeatherTheme {
         HomeScreen()
     }
+}
+
+fun DrawScope.drawCloudGradient(center: Offset, scale: Float, alpha: Float) {
+    val white = Color.White.copy(alpha = 0.85f * alpha)
+    val lightGray = Color(0xFFE3EAF2).copy(alpha = 0.65f * alpha)
+    val blueTint = Color(0xFFB3D8F7).copy(alpha = 0.45f * alpha)
+    drawCircle(
+        brush = Brush.radialGradient(listOf(white, lightGray), center = center, radius = scale * 1.1f),
+        radius = scale,
+        center = center
+    )
+    drawCircle(
+        brush = Brush.radialGradient(listOf(white, blueTint), center = center + Offset(-scale * 0.7f, scale * 0.1f), radius = scale * 0.8f),
+        radius = scale * 0.7f,
+        center = center + Offset(-scale * 0.7f, scale * 0.1f)
+    )
+    drawCircle(
+        brush = Brush.radialGradient(listOf(white, lightGray), center = center + Offset(scale * 0.7f, scale * 0.15f), radius = scale * 0.7f),
+        radius = scale * 0.6f,
+        center = center + Offset(scale * 0.7f, scale * 0.15f)
+    )
+    drawCircle(
+        brush = Brush.radialGradient(listOf(white, blueTint), center = center + Offset(0f, -scale * 0.5f), radius = scale * 0.6f),
+        radius = scale * 0.5f,
+        center = center + Offset(0f, -scale * 0.5f)
+    )
 }
