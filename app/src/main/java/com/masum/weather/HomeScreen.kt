@@ -105,6 +105,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             onUnitChange = {},
             onThemeChange = {},
             onNotificationsChange = {},
+            onBack = { showSettings = false }
         )
     } else {
         Box(

@@ -45,7 +45,8 @@ fun SettingsScreen(
     currentTheme: String = "System",
     onThemeChange: (String) -> Unit = {},
     notificationsEnabled: Boolean = true,
-    onNotificationsChange: (Boolean) -> Unit = {}
+    onNotificationsChange: (Boolean) -> Unit = {},
+    onBack: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -66,7 +67,7 @@ fun SettingsScreen(
             CenterAlignedTopAppBar(
                 title = { Text("Settings", fontSize = 22.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: handle back */ }) {
+                    IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
