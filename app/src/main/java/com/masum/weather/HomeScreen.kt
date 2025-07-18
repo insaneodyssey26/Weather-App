@@ -70,6 +70,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     var showSettings by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
     var appTheme by remember { mutableStateOf("System") }
+    var tempUnit by remember { mutableStateOf("C") }
     val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
     val cloud1X by infiniteTransition.animateFloat(
         initialValue = -0.3f,
@@ -108,7 +109,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
     if (showSettings) {
         SettingsScreen(
-            onUnitChange = {},
+            currentUnit = tempUnit,
+            onUnitChange = { tempUnit = it },
             currentTheme = appTheme,
             onThemeChange = { appTheme = it },
             onNotificationsChange = {},
@@ -207,7 +209,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // ...existing code for main content...
                 LocationSearchBar(
                     modifier = Modifier
                         .fillMaxWidth()
