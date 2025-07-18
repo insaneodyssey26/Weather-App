@@ -69,6 +69,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     var isMenuVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
+    var appTheme by remember { mutableStateOf("System") }
     val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
     val cloud1X by infiniteTransition.animateFloat(
         initialValue = -0.3f,
@@ -100,11 +101,16 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             repeatMode = RepeatMode.Reverse
         ), label = "cloud2Opacity"
     )
-    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDark = when (appTheme) {
+        "Light" -> false
+        "Dark" -> true
+        else -> androidx.compose.foundation.isSystemInDarkTheme()
+    }
     if (showSettings) {
         SettingsScreen(
             onUnitChange = {},
-            onThemeChange = {},
+            currentTheme = appTheme,
+            onThemeChange = { appTheme = it },
             onNotificationsChange = {},
             onBack = { showSettings = false }
         )

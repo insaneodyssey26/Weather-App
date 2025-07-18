@@ -92,15 +92,20 @@ fun SettingsScreen(
                             listOf("C", "F").forEach { unit ->
                                 val selected = currentUnit == unit
                                 if (selected) {
-                                    ElevatedButton(
+                                    Button(
                                         onClick = { onUnitChange(unit) },
                                         shape = RoundedCornerShape(50),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = Color.White
+                                        ),
                                         modifier = Modifier.padding(end = 8.dp)
                                     ) { Text(unit) }
                                 } else {
                                     OutlinedButton(
                                         onClick = { onUnitChange(unit) },
                                         shape = RoundedCornerShape(50),
+                                        colors = ButtonDefaults.outlinedButtonColors(),
                                         modifier = Modifier.padding(end = 8.dp)
                                     ) { Text(unit) }
                                 }
@@ -121,15 +126,20 @@ fun SettingsScreen(
                             listOf("Light", "Dark", "System").forEach { theme ->
                                 val selected = currentTheme == theme
                                 if (selected) {
-                                    ElevatedButton(
+                                    Button(
                                         onClick = { onThemeChange(theme) },
                                         shape = RoundedCornerShape(50),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = Color.White
+                                        ),
                                         modifier = Modifier.padding(end = 4.dp)
                                     ) { Text(theme, maxLines = 1) }
                                 } else {
                                     OutlinedButton(
                                         onClick = { onThemeChange(theme) },
                                         shape = RoundedCornerShape(50),
+                                        colors = ButtonDefaults.outlinedButtonColors(),
                                         modifier = Modifier.padding(end = 4.dp)
                                     ) { Text(theme, maxLines = 1) }
                                 }
