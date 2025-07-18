@@ -16,6 +16,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val apiKey: String? = project.findProperty("OPENWEATHER_API_KEY") as String?
+        if (!apiKey.isNullOrBlank()) {
+            buildConfigField("String", "OPENWEATHER_API_KEY", "\"$apiKey\"")
+        } else {
+            buildConfigField("String", "OPENWEATHER_API_KEY", "\"MISSING_API_KEY\"")
+        }
     }
 
     buildTypes {
@@ -36,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
