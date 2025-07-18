@@ -71,6 +71,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     var showAbout by remember { mutableStateOf(false) }
     var appTheme by remember { mutableStateOf("System") }
     var tempUnit by remember { mutableStateOf("C") }
+    var notificationsEnabled by remember { mutableStateOf(true) }
     val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
     val cloud1X by infiniteTransition.animateFloat(
         initialValue = -0.3f,
@@ -113,7 +114,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             onUnitChange = { tempUnit = it },
             currentTheme = appTheme,
             onThemeChange = { appTheme = it },
-            onNotificationsChange = {},
+            notificationsEnabled = notificationsEnabled,
+            onNotificationsChange = { notificationsEnabled = it },
             onBack = { showSettings = false }
         )
     } else {
