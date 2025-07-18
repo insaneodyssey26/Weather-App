@@ -109,15 +109,22 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         else -> androidx.compose.foundation.isSystemInDarkTheme()
     }
     if (showSettings) {
-        SettingsScreen(
-            currentUnit = tempUnit,
-            onUnitChange = { tempUnit = it },
-            currentTheme = appTheme,
-            onThemeChange = { appTheme = it },
-            notificationsEnabled = notificationsEnabled,
-            onNotificationsChange = { notificationsEnabled = it },
-            onBack = { showSettings = false }
-        )
+        val (darkTheme, dynamicColor) = when (appTheme) {
+            "Light" -> false to false
+            "Dark" -> true to false
+            else -> androidx.compose.foundation.isSystemInDarkTheme() to true
+        }
+        com.masum.weather.ui.theme.WeatherTheme(darkTheme = darkTheme, dynamicColor = dynamicColor) {
+            SettingsScreen(
+                currentUnit = tempUnit,
+                onUnitChange = { tempUnit = it },
+                currentTheme = appTheme,
+                onThemeChange = { appTheme = it },
+                notificationsEnabled = notificationsEnabled,
+                onNotificationsChange = { notificationsEnabled = it },
+                onBack = { showSettings = false }
+            )
+        }
     } else {
         Box(
             modifier = modifier
