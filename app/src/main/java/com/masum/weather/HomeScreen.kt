@@ -73,7 +73,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val forecastState by weatherViewModel.forecastState.collectAsState()
     val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
-    var currentCity by remember { mutableStateOf("Tuscany") }
+    var currentCity by remember { mutableStateOf("Alaska") }
     LaunchedEffect(Unit) {
         weatherViewModel.fetchWeather(currentCity)
         weatherViewModel.fetchForecast(currentCity)
