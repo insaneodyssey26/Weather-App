@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import com.masum.weather.BuildConfig
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,9 +66,11 @@ import androidx.compose.ui.unit.sp
 import com.masum.weather.ui.theme.WeatherTheme
 
 @Composable
+
 fun HomeScreen(modifier: Modifier = Modifier) {
     val weatherViewModel: WeatherViewModel = viewModel()
     val weatherState by weatherViewModel.weatherState.collectAsState()
+    val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
     LaunchedEffect(Unit) {
         weatherViewModel.fetchWeather("Tuscany")
@@ -136,6 +139,17 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             modifier = modifier
                 .fillMaxSize()
         ) {
+            // DEBUG: Show API key in the center for troubleshooting
+            Text(
+                text = "API Key: $apiKey",
+                color = Color.Red,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .background(Color.White.copy(alpha = 0.8f))
+                    .padding(16.dp)
+            )
             Canvas(modifier = Modifier.matchParentSize().blur(24.dp)) {
                 val w = size.width
                 val h = size.height
