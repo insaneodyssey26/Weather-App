@@ -70,11 +70,13 @@ import com.masum.weather.ui.theme.WeatherTheme
 fun HomeScreen(modifier: Modifier = Modifier) {
     val weatherViewModel: WeatherViewModel = viewModel()
     val weatherState by weatherViewModel.weatherState.collectAsState()
+    val forecastState by weatherViewModel.forecastState.collectAsState()
     val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
     var currentCity by remember { mutableStateOf("Tuscany") }
     LaunchedEffect(Unit) {
         weatherViewModel.fetchWeather(currentCity)
+        weatherViewModel.fetchForecast(currentCity)
     }
     var isMenuVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
@@ -341,23 +343,32 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                             color = Color.Black,
                             modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
                         )
-                        val hourlyData = listOf(
-                            "06:00 AM" to "23",
-                            "09:00 AM" to "16",
-                            "12:00 PM" to "3",
-                            "03:00 PM" to "23",
-                            "06:00 PM" to "21",
-                            "09:00 PM" to "18",
-                            "12:00 AM" to "15"
-                        )
-                        androidx.compose.foundation.lazy.LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            items(hourlyData.size) { index ->
-                                val (time, temp) = hourlyData[index]
-                                HourlyWeatherItem(time = time, temp = temp)
+                        when (forecastState) {
+                            is WeatherUiState.Loading -> {
+                                Text("Loading hourly forecast...", color = Color.Gray)
                             }
+                            is WeatherUiState.ForecastSuccess -> {
+                                val forecast = (forecastState as WeatherUiState.ForecastSuccess).forecast
+                                val hourlyList = forecast.list?.take(8) ?: emptyList() // Show next 8 intervals (24h)
+                                androidx.compose.foundation.lazy.LazyRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    items(hourlyList.size) { index ->
+                                        val item = hourlyList[index]
+                                        val time = item.dtTxt?.substringAfter(' ')?.substring(0,5) ?: "--:--"
+                                        val temp = item.main?.temp?.toInt()?.toString() ?: "-"
+                                        HourlyWeatherItem(time = time, temp = temp)
+                                    }
+                                }
+                            }
+                            is WeatherUiState.Error -> {
+                                Text((forecastState as WeatherUiState.Error).message, color = Color.Red)
+                            }
+                            WeatherUiState.Empty -> {
+                                Text("No forecast data", color = Color.Gray)
+                            }
+                            else -> {}
                         }
                     }
                 }
