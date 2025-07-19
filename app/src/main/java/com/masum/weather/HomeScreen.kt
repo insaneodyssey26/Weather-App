@@ -306,8 +306,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                                     modifier = Modifier.padding(top = 6.dp)
                                 )
                             }
-                            WeatherUiState.Empty -> {
-                                Text("No weather data", color = Color.White)
+                            else -> {
+                                Text("No weather data available", color = Color.White)
                             }
                         }
                     }
@@ -365,7 +365,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                             is WeatherUiState.Error -> {
                                 Text((forecastState as WeatherUiState.Error).message, color = Color.Red)
                             }
-                            WeatherUiState.Empty -> {
+                            is WeatherUiState.Empty -> {
                                 Text("No forecast data", color = Color.Gray)
                             }
                             else -> {}
