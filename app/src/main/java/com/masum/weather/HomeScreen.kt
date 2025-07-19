@@ -30,16 +30,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import com.masum.weather.viewmodel.WeatherViewModel
+import com.masum.weather.viewmodel.WeatherUiState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -66,6 +66,12 @@ import com.masum.weather.ui.theme.WeatherTheme
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+    val weatherViewModel: WeatherViewModel = viewModel()
+    val weatherState by weatherViewModel.weatherState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        weatherViewModel.fetchWeather("Tuscany")
+    }
     var isMenuVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
@@ -240,62 +246,54 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Today, Oct 19 6:10",
-                            color = Color.White.copy(alpha = 0.85f),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Canvas(modifier = Modifier.size(36.dp)) {
-                            drawSunIcon(this)
-                        }
-                        Text(
-                            buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Color.White,
-                                        fontSize = 88.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        shadow = Shadow(
-                                            color = Color.Black.copy(alpha = 0.22f),
-                                            blurRadius = 10f,
-                                            offset = Offset(0f, 4f)
-                                        )
-                                    )
-                                ) {
-                                    append("23")
-                                }
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Color.White,
-                                        fontSize = 32.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        baselineShift = androidx.compose.ui.text.style.BaselineShift(0.7f)
-                                    )
-                                ) {
-                                    append("°C")
-                                }
-                            },
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .align(Alignment.CenterHorizontally),
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "It's Sunny",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium,
-                            style = androidx.compose.ui.text.TextStyle(
-                                shadow = Shadow(
-                                    color = Color.Black.copy(alpha = 0.18f),
-                                    blurRadius = 4f,
-                                    offset = Offset(0f, 2f)
+                        when (weatherState) {
+                            is WeatherUiState.Loading -> {
+                                Text("Loading weather...", color = Color.White)
+                            }
+                            is WeatherUiState.Error -> {
+                                Text((weatherState as WeatherUiState.Error).message, color = Color.Red)
+                            }
+                            is WeatherUiState.Success -> {
+                                val data = (weatherState as WeatherUiState.Success).data
+                                Text(
+                                    text = data.cityName ?: "-",
+                                    color = Color.White.copy(alpha = 0.85f),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    modifier = Modifier.padding(bottom = 8.dp)
                                 )
-                            ),
-                            modifier = Modifier.padding(top = 6.dp)
-                        )
+                                Canvas(modifier = Modifier.size(36.dp)) {
+                                    drawSunIcon(this)
+                                }
+                                Text(
+                                    text = "${data.main?.temp?.toInt() ?: "-"}°C",
+                                    color = Color.White,
+                                    fontSize = 88.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .align(Alignment.CenterHorizontally),
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = data.weather?.firstOrNull()?.main ?: "-",
+                                    color = Color.White,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    style = androidx.compose.ui.text.TextStyle(
+                                        shadow = Shadow(
+                                            color = Color.Black.copy(alpha = 0.18f),
+                                            blurRadius = 4f,
+                                            offset = Offset(0f, 2f)
+                                        )
+                                    ),
+                                    modifier = Modifier.padding(top = 6.dp)
+                                )
+                            }
+                            WeatherUiState.Empty -> {
+                                Text("No weather data", color = Color.White)
+                            }
+                        }
                     }
                 }
                 Box(
