@@ -72,8 +72,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val weatherState by weatherViewModel.weatherState.collectAsState()
     val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
+    var currentCity by remember { mutableStateOf("Tuscany") }
     LaunchedEffect(Unit) {
-        weatherViewModel.fetchWeather("Tuscany")
+        weatherViewModel.fetchWeather(currentCity)
     }
     var isMenuVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
@@ -139,7 +140,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             modifier = modifier
                 .fillMaxSize()
         ) {
-            // DEBUG: Show API key in the center for troubleshooting
             Text(
                 text = "API Key: $apiKey",
                 color = Color.Red,
@@ -376,6 +376,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 onClose = { isMenuVisible = false },
                 onMenuItemClick = { menuItem ->
                     when (menuItem) {
+                        "Refresh" -> {
+                            weatherViewModel.fetchWeather(currentCity)
+                            isMenuVisible = false
+                        }
                         "Settings" -> {
                             showSettings = true
                             isMenuVisible = false
