@@ -49,7 +49,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
     var currentCity by remember { mutableStateOf("") }
-    // No initial fetch; wait for user to select a city
+    // Show search bar only after button is clicked
+    var showSearchBar by remember { mutableStateOf(false) }
     var isMenuVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
@@ -114,7 +115,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             modifier = modifier
                 .fillMaxSize()
         ) {
-            // ...existing code...
+            // ...background and menu code remains unchanged...
             Canvas(modifier = Modifier.matchParentSize().blur(24.dp)) {
                 val w = size.width
                 val h = size.height
@@ -130,11 +131,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     drawRect(
                         brush = Brush.verticalGradient(
                             colors = listOf(
-                                Color(0xFFB2EBF2), // Light Cyan
-                                Color(0xFFB3E5FC), // Light Blue
-                                Color(0xFF81D4FA), // Sky Blue
-                                Color(0xFFB2DFDB), // Light Teal
-                                Color(0xFFF5F5F5)  // Very Light Gray (bottom)
+                                Color(0xFFB2EBF2),
+                                Color(0xFFB3E5FC),
+                                Color(0xFF81D4FA),
+                                Color(0xFFB2DFDB),
+                                Color(0xFFF5F5F5)
                             ),
                             startY = 0f, endY = h
                         ),
@@ -196,147 +197,167 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(start = 6.dp)
                 )
             }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LocationSearchBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 100.dp),
-                    onLocationSelected = { location ->
-                        currentCity = location
-                        weatherViewModel.fetchWeather(location)
-                        weatherViewModel.fetchForecast(location)
-                    },
-                    onSearchTextChange = { searchText ->
-                    }
-                )
+
+            if (!showSearchBar) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(32.dp))
-                        .background(Color.White.copy(alpha = 0.18f))
-                        .padding(vertical = 28.dp, horizontal = 12.dp)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    androidx.compose.material3.Button(
+                        onClick = { showSearchBar = true },
+                        shape = RoundedCornerShape(32.dp),
+                        modifier = Modifier
+                            .height(56.dp)
+                            .width(220.dp)
                     ) {
-                        when (weatherState) {
-                            is WeatherUiState.Loading -> {
-                                Text("Loading weather...", color = Color.White)
-                            }
-                            is WeatherUiState.Error -> {
-                                Text((weatherState as WeatherUiState.Error).message, color = Color.Red)
-                            }
-                            is WeatherUiState.Success -> {
-                                val data = (weatherState as WeatherUiState.Success).data
-                                Text(
-                                    text = data.cityName ?: "-",
-                                    color = Color.White.copy(alpha = 0.85f),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                                )
-                                Canvas(modifier = Modifier.size(36.dp)) {
-                                    drawSunIcon(this)
+                        Text("Search for Location", fontSize = 18.sp)
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LocationSearchBar(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 100.dp),
+                        onLocationSelected = { location ->
+                            currentCity = location
+                            weatherViewModel.fetchWeather(location)
+                            weatherViewModel.fetchForecast(location)
+                        },
+                        onSearchTextChange = { searchText ->
+                        }
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(32.dp))
+                            .background(Color.White.copy(alpha = 0.18f))
+                            .padding(vertical = 28.dp, horizontal = 12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            when (weatherState) {
+                                is WeatherUiState.Loading -> {
+                                    Text("Loading weather...", color = Color.White)
                                 }
-                                Text(
-                                    text = "${data.main?.temp?.toInt() ?: "-"}°C",
-                                    color = Color.White,
-                                    fontSize = 88.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier
-                                        .padding(top = 8.dp)
-                                        .align(Alignment.CenterHorizontally),
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    text = data.weather?.firstOrNull()?.main ?: "-",
-                                    color = Color.White,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    style = androidx.compose.ui.text.TextStyle(
-                                        shadow = Shadow(
-                                            color = Color.Black.copy(alpha = 0.18f),
-                                            blurRadius = 4f,
-                                            offset = Offset(0f, 2f)
-                                        )
-                                    ),
-                                    modifier = Modifier.padding(top = 6.dp)
-                                )
-                            }
-                            else -> {
-                                Text("No weather data available", color = Color.White)
+                                is WeatherUiState.Error -> {
+                                    Text((weatherState as WeatherUiState.Error).message, color = Color.Red)
+                                }
+                                is WeatherUiState.Success -> {
+                                    val data = (weatherState as WeatherUiState.Success).data
+                                    Text(
+                                        text = data.cityName ?: "-",
+                                        color = Color.White.copy(alpha = 0.85f),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        modifier = Modifier.padding(bottom = 8.dp)
+                                    )
+                                    Canvas(modifier = Modifier.size(36.dp)) {
+                                        drawSunIcon(this)
+                                    }
+                                    Text(
+                                        text = "${data.main?.temp?.toInt() ?: "-"}°C",
+                                        color = Color.White,
+                                        fontSize = 88.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier
+                                            .padding(top = 8.dp)
+                                            .align(Alignment.CenterHorizontally),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Text(
+                                        text = data.weather?.firstOrNull()?.main ?: "-",
+                                        color = Color.White,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        style = androidx.compose.ui.text.TextStyle(
+                                            shadow = Shadow(
+                                                color = Color.Black.copy(alpha = 0.18f),
+                                                blurRadius = 4f,
+                                                offset = Offset(0f, 2f)
+                                            )
+                                        ),
+                                        modifier = Modifier.padding(top = 6.dp)
+                                    )
+                                }
+                                else -> {
+                                    Text("No weather data available", color = Color.White)
+                                }
                             }
                         }
                     }
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 32.dp)
-                ) {
-                    Column(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(
-                                Color.White.copy(alpha = 0.9f)
-                            )
-                            .padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(bottom = 32.dp)
                     ) {
-                        Box(
+                        Column(
                             modifier = Modifier
-                                .width(40.dp)
-                                .height(4.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(24.dp))
                                 .background(
-                                    Color.Gray.copy(alpha = 0.3f),
-                                    shape = RoundedCornerShape(2.dp)
+                                    Color.White.copy(alpha = 0.9f)
                                 )
-                        )
-                        Text(
-                            text = "Weather Today",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Black,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
-                        )
-                        when (forecastState) {
-                            is WeatherUiState.Loading -> {
-                                Text("Loading hourly forecast...", color = Color.Gray)
-                            }
-                            is WeatherUiState.ForecastSuccess -> {
-                                val forecast = (forecastState as WeatherUiState.ForecastSuccess).forecast
-                                val hourlyList = forecast.list?.take(8) ?: emptyList() // Show next 8 intervals (24h)
-                                androidx.compose.foundation.lazy.LazyRow(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    items(hourlyList.size) { index ->
-                                        val item = hourlyList[index]
-                                        val time = item.dtTxt?.substringAfter(' ')?.substring(0,5) ?: "--:--"
-                                        val temp = item.main?.temp?.toInt()?.toString() ?: "-"
-                                        HourlyWeatherItem(time = time, temp = temp)
+                                .padding(20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(40.dp)
+                                    .height(4.dp)
+                                    .background(
+                                        Color.Gray.copy(alpha = 0.3f),
+                                        shape = RoundedCornerShape(2.dp)
+                                    )
+                            )
+                            Text(
+                                text = "Weather Today",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
+                            )
+                            when (forecastState) {
+                                is WeatherUiState.Loading -> {
+                                    Text("Loading hourly forecast...", color = Color.Gray)
+                                }
+                                is WeatherUiState.ForecastSuccess -> {
+                                    val forecast = (forecastState as WeatherUiState.ForecastSuccess).forecast
+                                    val hourlyList = forecast.list?.take(8) ?: emptyList()
+                                    androidx.compose.foundation.lazy.LazyRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+                                        items(hourlyList.size) { index ->
+                                            val item = hourlyList[index]
+                                            val time = item.dtTxt?.substringAfter(' ')?.substring(0,5) ?: "--:--"
+                                            val temp = item.main?.temp?.toInt()?.toString() ?: "-"
+                                            HourlyWeatherItem(time = time, temp = temp)
+                                        }
                                     }
                                 }
+                                is WeatherUiState.Error -> {
+                                    Text((forecastState as WeatherUiState.Error).message, color = Color.Red)
+                                }
+                                is WeatherUiState.Empty -> {
+                                    Text("No forecast data", color = Color.Gray)
+                                }
+                                else -> {}
                             }
-                            is WeatherUiState.Error -> {
-                                Text((forecastState as WeatherUiState.Error).message, color = Color.Red)
-                            }
-                            is WeatherUiState.Empty -> {
-                                Text("No forecast data", color = Color.Gray)
-                            }
-                            else -> {}
                         }
                     }
                 }
             }
+
             if (isMenuVisible) {
                 Box(
                     modifier = Modifier
