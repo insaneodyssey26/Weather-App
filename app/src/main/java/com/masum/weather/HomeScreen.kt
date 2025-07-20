@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
@@ -49,7 +50,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
     var currentCity by remember { mutableStateOf("") }
-    // Show search bar only after button is clicked
     var showSearchBar by remember { mutableStateOf(false) }
     var isMenuVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
@@ -57,6 +57,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     var appTheme by remember { mutableStateOf("System") }
     var tempUnit by remember { mutableStateOf("C") }
     var notificationsEnabled by remember { mutableStateOf(true) }
+    var showLocations by remember { mutableStateOf(false) }
+    var recentLocations by remember { mutableStateOf(listOf<String>()) }
     val infiniteTransition = rememberInfiniteTransition(label = "bg_anim")
     val cloud1X by infiniteTransition.animateFloat(
         initialValue = -0.3f,
@@ -93,7 +95,64 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         "Dark" -> true
         else -> androidx.compose.foundation.isSystemInDarkTheme()
     }
-    if (showSettings) {
+    if (showLocations) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White.copy(alpha = 0.98f))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Recent Locations", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4682B4), modifier = Modifier.padding(top = 32.dp, bottom = 16.dp))
+                if (recentLocations.isEmpty()) {
+                    Text("No recent locations", color = Color.Gray, fontSize = 16.sp, modifier = Modifier.padding(24.dp))
+                } else {
+                    recentLocations.forEach { location ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp, horizontal = 24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = location,
+                                fontSize = 18.sp,
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+                                        currentCity = location
+                                        weatherViewModel.fetchWeather(location)
+                                        weatherViewModel.fetchForecast(location)
+                                        showLocations = false
+                                        showSearchBar = true
+                                    }
+                            )
+                            androidx.compose.material3.IconButton(
+                                onClick = {
+                                    recentLocations = recentLocations.filter { it != location }
+                                }
+                            ) {
+                                androidx.compose.material3.Icon(
+                                    imageVector = androidx.compose.material.icons.Icons.Default.Clear,
+                                    contentDescription = "Remove",
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                androidx.compose.material3.Button(onClick = { showLocations = false }, shape = RoundedCornerShape(32.dp)) {
+                    Text("Back", fontSize = 16.sp)
+                }
+            }
+        }
+    } else if (showSettings) {
         val (darkTheme, dynamicColor) = when (appTheme) {
             "Light" -> false to false
             "Dark" -> true to false
@@ -230,6 +289,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                             currentCity = location
                             weatherViewModel.fetchWeather(location)
                             weatherViewModel.fetchForecast(location)
+                            if (location.isNotBlank() && !recentLocations.contains(location)) {
+                                recentLocations = (listOf(location) + recentLocations).take(10)
+                            }
                         },
                         onSearchTextChange = { searchText ->
                         }
@@ -372,6 +434,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 onClose = { isMenuVisible = false },
                 onMenuItemClick = { menuItem ->
                     when (menuItem) {
+                        "Locations" -> {
+                            showLocations = true
+                            isMenuVisible = false
+                        }
                         "Refresh" -> {
                             weatherViewModel.fetchWeather(currentCity)
                             weatherViewModel.fetchForecast(currentCity)
