@@ -192,7 +192,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "Tuscany",
+                    text = currentCity,
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
@@ -211,10 +211,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         .fillMaxWidth()
                         .padding(top = 100.dp),
                     onLocationSelected = { location ->
-                        println("Location selected: $location")
+                        currentCity = location
+                        weatherViewModel.fetchWeather(location)
+                        weatherViewModel.fetchForecast(location)
                     },
                     onSearchTextChange = { searchText ->
-                        println("Search text: $searchText")
                     }
                 )
                 Box(
@@ -355,6 +356,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     when (menuItem) {
                         "Refresh" -> {
                             weatherViewModel.fetchWeather(currentCity)
+                            weatherViewModel.fetchForecast(currentCity)
                             isMenuVisible = false
                         }
                         "Settings" -> {
