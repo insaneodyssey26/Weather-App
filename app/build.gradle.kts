@@ -29,6 +29,13 @@ android {
         } else {
             buildConfigField("String", "OPENWEATHER_API_KEY", "\"MISSING_API_KEY\"")
         }
+
+        val locationIqKey: String? = localProperties.getProperty("LOCATIONIQ_API_KEY")
+        if (!locationIqKey.isNullOrBlank()) {
+            buildConfigField("String", "LOCATIONIQ_API_KEY", "\"$locationIqKey\"")
+        } else {
+            buildConfigField("String", "LOCATIONIQ_API_KEY", "\"MISSING_API_KEY\"")
+        }
     }
 
     buildFeatures {

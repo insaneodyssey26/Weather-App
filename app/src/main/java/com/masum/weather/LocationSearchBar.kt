@@ -14,11 +14,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import com.masum.weather.network.LocationIqRetrofitInstance
+import com.masum.weather.network.model.LocationIqSuggestion
+import com.masum.weather.BuildConfig
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -138,18 +140,48 @@ fun LocationSuggestions(
     onLocationSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sampleSuggestions = listOf(
-        "New York, NY",
-        "London, UK",
-        "Tokyo, Japan",
-        "Paris, France",
-        "Sydney, Australia",
-        "Mumbai, India",
-        "Toronto, Canada",
-        "Berlin, Germany"
-    ).filter { it.contains(searchText, ignoreCase = true) }
-    
-    if (sampleSuggestions.isNotEmpty()) {
+    var suggestions by remember { mutableStateOf<List<LocationIqSuggestion>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(searchText) {
+        if (searchText.isNotBlank()) {
+            isLoading = true
+            error = null
+            coroutineScope.launch(Dispatchers.IO) {
+                try {
+                    val result = LocationIqRetrofitInstance.api.autocomplete(
+                        apiKey = BuildConfig.LOCATIONIQ_API_KEY,
+                        query = searchText
+                    )
+                    suggestions = result
+                    isLoading = false
+                } catch (e: Exception) {
+                    suggestions = emptyList()
+                    error = "No suggestions found"
+                    isLoading = false
+                }
+            }
+        } else {
+            suggestions = emptyList()
+            error = null
+        }
+    }
+
+    if (isLoading) {
+        Box(
+            modifier = modifier
+                .background(
+                    Color.White,
+                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                )
+                .padding(vertical = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Loading...", color = Color.Gray)
+        }
+    } else if (!suggestions.isNullOrEmpty()) {
         Column(
             modifier = modifier
                 .background(
@@ -158,11 +190,17 @@ fun LocationSuggestions(
                 )
                 .padding(vertical = 8.dp)
         ) {
-            sampleSuggestions.take(5).forEach { suggestion ->
+            suggestions.take(5).forEach { suggestion ->
+                val displayName = suggestion.displayPlace
+                    ?: suggestion.address?.city
+                    ?: suggestion.address?.state
+                    ?: suggestion.address?.country
+                    ?: suggestion.displayAddress
+                    ?: "Unknown"
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onLocationSelected(suggestion) }
+                        .clickable { onLocationSelected(displayName) }
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -174,13 +212,25 @@ fun LocationSuggestions(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = suggestion,
+                        text = displayName,
                         fontSize = 16.sp,
                         color = Color.Black,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
+        }
+    } else if (error != null) {
+        Box(
+            modifier = modifier
+                .background(
+                    Color.White,
+                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                )
+                .padding(vertical = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(error ?: "No suggestions", color = Color.Gray)
         }
     }
 }
