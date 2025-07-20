@@ -191,12 +191,16 @@ fun LocationSuggestions(
                 .padding(vertical = 8.dp)
         ) {
             suggestions.take(5).forEach { suggestion ->
-                val displayName = suggestion.displayPlace
-                    ?: suggestion.address?.city
-                    ?: suggestion.address?.state
-                    ?: suggestion.address?.country
-                    ?: suggestion.displayAddress
-                    ?: "Unknown"
+                val address = suggestion.address
+                val parts = listOfNotNull(
+                    suggestion.displayPlace,
+                    address?.city?.takeIf { it != suggestion.displayPlace },
+                    address?.state,
+                    address?.country
+                ).distinct()
+                val displayName = parts.joinToString(", ").ifBlank {
+                    suggestion.displayAddress ?: "Unknown"
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
